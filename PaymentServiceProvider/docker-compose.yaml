@@ -1,0 +1,31 @@
+version: '3.7'
+networks:
+  dev:
+    driver: bridge
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "Mssql!Passw0rd"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      DATABASE_NAME: "PaymentServiceProviderDb"
+    ports:
+      - "1433:1433"
+  mssqltools:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./docker-database/01-create-psp-database.sql:/tmp/01-create-psp-database.sql
+      - ./docker-database/02-insert-psp-data.sql:/tmp/02-insert-psp-data.sql
+      - ./docker-database/init-database.sh:/tmp/init-database.sh
+    command: /bin/bash ./tmp/init-database.sh
+  psp-api:
+    depends_on:
+      - sqlserver
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
