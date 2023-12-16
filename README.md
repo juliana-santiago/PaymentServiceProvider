@@ -1,4 +1,4 @@
-# Desafio - Stone
+# Payment Service Provider API
 
 #### Executando o projeto
 
